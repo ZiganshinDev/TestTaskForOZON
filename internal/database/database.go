@@ -91,3 +91,15 @@ func IsShortURLExists(shortURL string) bool {
 	}
 	return exists
 }
+
+func IsOriginalURLExists(originalURL string) bool {
+	db := createConnection()
+	defer db.Close()
+
+	var exists bool
+	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM urls WHERE short_url = $1)", originalURL).Scan(&exists)
+	if err != nil {
+		return false
+	}
+	return exists
+}

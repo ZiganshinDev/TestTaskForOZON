@@ -44,7 +44,7 @@ func GetShortURL(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Unable to decode the request body. %v", err)
 	}
 
-	if !isValidURL(url.OriginalURL) {
+	if !isValidURL(url.OriginalURL) || !database.IsOriginalURLExists(url.OriginalURL) {
 		http.Error(w, "Invalid URL", http.StatusBadRequest)
 		return
 	}
