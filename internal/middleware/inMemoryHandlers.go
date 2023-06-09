@@ -30,15 +30,15 @@ func (s *InMemoryService) GetShortURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Проверяем, является ли URL валидным
-	if !isValidURL(originalURL.URL) || valueExists(s.urlMap, originalURL.URL) {
+	if !IsValidURL(originalURL.URL) || valueExists(s.urlMap, originalURL.URL) {
 		http.Error(w, "Invalid URL", http.StatusBadRequest)
 		return
 	}
 
 	// Генерируем случайный короткий URL
-	shortURL := generateShortURL()
+	shortURL := GenerateShortURL()
 	for s.urlMap[shortURL] != "" {
-		shortURL = generateShortURL()
+		shortURL = GenerateShortURL()
 	}
 
 	// Сохраняем оригинальный и сокращенный URL в мапе
@@ -46,7 +46,7 @@ func (s *InMemoryService) GetShortURL(w http.ResponseWriter, r *http.Request) {
 
 	// Отправляем клиенту сокращенный URL
 	res := map[string]string{
-		"short_url": getProtocol(originalURL.URL) + shortURL,
+		"short_url": GetProtocol(originalURL.URL) + shortURL,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
