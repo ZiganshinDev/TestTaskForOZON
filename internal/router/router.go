@@ -5,13 +5,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Router() *mux.Router {
+func Router(storage string) *mux.Router {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/shorten", middleware.GetShortURL).Methods("POST")
-	router.HandleFunc("/shorten/db", middleware.GetShortURL).Methods("POST")
-	router.HandleFunc("/original/{shorturl}", middleware.GetLongURL).Methods("GET")
-	router.HandleFunc("/original/db/{shorturl}", middleware.GetLongURL).Methods("GET")
+	if storage == "postgres" {
+		data := middleware.PostgreSQLService{}
+
+		router.HandleFunc("/shorten", data.GetShortURL).Methods("POST")
+		router.HandleFunc("/original/{shorturl}", data.GetLongURL).Methods("GET")
+	} else {
+		urlService := middleware.NewInMemoryService()
+
+		router.HandleFunc("/shorten", urlService.GetShortURL).Methods("POST")
+		router.HandleFunc("/original/{shorturl}", urlService.GetLongURL).Methods("GET")
+	}
 
 	return router
 }

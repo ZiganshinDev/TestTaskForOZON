@@ -2,11 +2,9 @@ package middleware
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -20,12 +18,6 @@ const (
 	chars          = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 )
 
-type response struct {
-	ID       int64  `json:"id,omitempty"`
-	Message  string `json:"message,omitempty"`
-	ShortURL string `json:"url,omitempty"`
-}
-
 func generateShortURL() string {
 	rand.Seed(time.Now().UnixNano())
 
@@ -36,7 +28,10 @@ func generateShortURL() string {
 	return code.String()
 }
 
-func GetShortURL(w http.ResponseWriter, r *http.Request) {
+type PostgreSQLService struct {
+}
+
+func (s *PostgreSQLService) GetShortURL(w http.ResponseWriter, r *http.Request) {
 	var url models.URLs
 
 	err := json.NewDecoder(r.Body).Decode(&url)
@@ -44,7 +39,7 @@ func GetShortURL(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Unable to decode the request body. %v", err)
 	}
 
-	if !isValidURL(url.OriginalURL) || !database.IsOriginalURLExists(url.OriginalURL) {
+	if !isValidURL(url.OriginalURL) || database.NewPostgreSQLStorage().IsOriginalURLExists(url.OriginalURL) {
 		http.Error(w, "Invalid URL", http.StatusBadRequest)
 		return
 	}
@@ -52,12 +47,10 @@ func GetShortURL(w http.ResponseWriter, r *http.Request) {
 	// Генерируем короткий URL и проверяем его на уникальность
 	for {
 		shortURL := generateShortURL()
-		if !database.IsShortURLExists(shortURL) {
-			insertID := database.InsertURLs(url.OriginalURL, shortURL)
-			res := response{
-				ID:       insertID,
-				Message:  "URL shortened successfully",
-				ShortURL: fmt.Sprint(getProtocol(url.OriginalURL), shortURL),
+		if !database.NewPostgreSQLStorage().IsShortURLExists(shortURL) {
+			database.NewPostgreSQLStorage().InsertURLs(url.OriginalURL, shortURL)
+			res := map[string]string{
+				"short_url": getProtocol(url.OriginalURL) + shortURL,
 			}
 
 			w.Header().Set("Context-Type", "application/json")
@@ -69,23 +62,27 @@ func GetShortURL(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetLongURL(w http.ResponseWriter, r *http.Request) {
+func (s *PostgreSQLService) GetLongURL(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	shortURL := params["shorturl"]
 
-	originalURL, err := database.GetLongURL(shortURL)
+	originalURL, err := database.NewPostgreSQLStorage().GetLongURL(shortURL)
 	if err != nil {
 		log.Fatalf("Unable to get url. %v", err)
 	}
 
+	res := map[string]string{
+		"original_url": originalURL,
+	}
+
 	w.Header().Set("Context-Type", "application/json")
-	json.NewEncoder(w).Encode(originalURL)
+	json.NewEncoder(w).Encode(res)
 }
 
-func isValidURL(input string) bool {
-	u, err := url.Parse(input)
-	return err == nil && u.Scheme != "" && u.Host != ""
+func isValidURL(url string) bool {
+	_, err := http.Get(url)
+	return err == nil
 }
 
 func getProtocol(url string) (protocol string) {

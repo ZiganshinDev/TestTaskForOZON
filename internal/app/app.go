@@ -1,6 +1,8 @@
 package app
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -14,9 +16,29 @@ func Run() {
 		log.Fatalf("Error loading .env file. %v", err)
 	}
 
-	r := router.Router()
+	var storageType string
+	flag.StringVar(&storageType, "storage", "in-memory", "Type of storage to use (in-memory or postgres)")
+	flag.Parse()
 
-	log.Println("Starting server on the port 8080...")
+	fmt.Println("Using storage:", storageType)
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	if storageType == "in-memory" {
+		// Инициализация in-memory хранилища
+		r := router.Router("in-memory")
+
+		log.Println("Starting server on the port 8080...")
+
+		log.Fatal(http.ListenAndServe(":8080", r))
+	} else if storageType == "postgres" {
+		// Инициализация PostgreSQL хранилища
+		r := router.Router("postgres")
+
+		log.Println("Starting server on the port 8080...")
+
+		log.Fatal(http.ListenAndServe(":8080", r))
+	} else {
+		// Обработка некорректного значения флага
+		fmt.Println("Unknown storage type:", storageType)
+		return
+	}
 }
