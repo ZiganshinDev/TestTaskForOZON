@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/database"
 	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/middleware"
 	"github.com/gorilla/mux"
 )
@@ -9,10 +10,11 @@ func Router(storage string) *mux.Router {
 	router := mux.NewRouter()
 
 	if storage == "postgres" {
-		data := middleware.PostgreSQLService{}
+		db := database.NewPostgreSQLStorage()
+		service := middleware.NewPostgreSQLService(db)
 
-		router.HandleFunc("/shorten", data.GetShortURL).Methods("POST")
-		router.HandleFunc("/original/{shorturl}", data.GetOriginalURL).Methods("GET")
+		router.HandleFunc("/shorten", service.GetShortURL).Methods("POST")
+		router.HandleFunc("/original/{shorturl}", service.GetOriginalURL).Methods("GET")
 	} else {
 		urlService := middleware.NewInMemoryService()
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/models"
 
@@ -19,7 +20,7 @@ const (
 )
 
 type PostgreSQLStorage struct {
-	db *sql.DB
+	DBPool *sync.Pool
 }
 
 func NewPostgreSQLStorage() *PostgreSQLStorage {
@@ -27,29 +28,34 @@ func NewPostgreSQLStorage() *PostgreSQLStorage {
 
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
-	db, err := sql.Open("postgres", psqlconn)
-	if err != nil {
-		log.Fatal(err)
-	}
+	dbPool := &sync.Pool{
+		New: func() interface{} {
+			db, err := sql.Open("postgres", psqlconn)
+			if err != nil {
+				log.Fatal(err)
+			}
 
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
+			err = db.Ping()
+			if err != nil {
+				panic(err)
+			}
 
-	log.Println("Successfully connected")
+			return db
+		},
+	}
 
 	return &PostgreSQLStorage{
-		db: db,
+		DBPool: dbPool,
 	}
 }
 
 func (s *PostgreSQLStorage) InsertURLs(originalURL, shortURL string) {
-	defer s.db.Close()
+	db := s.DBPool.Get().(*sql.DB)
+	defer db.Close()
 
 	sqlStatement := `INSERT INTO urls (original_url, short_url) VALUES ($1, $2)`
 
-	_, err := s.db.Exec(sqlStatement, originalURL, shortURL)
+	_, err := db.Exec(sqlStatement, originalURL, shortURL)
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
 	}
@@ -58,13 +64,14 @@ func (s *PostgreSQLStorage) InsertURLs(originalURL, shortURL string) {
 }
 
 func (s *PostgreSQLStorage) GetOriginalURL(shortURL string) (string, error) {
-	defer s.db.Close()
+	db := s.DBPool.Get().(*sql.DB)
+	defer db.Close()
 
 	var url models.URLs
 
 	sqlStatement := `SELECT * FROM urls WHERE short_url = $1`
 
-	row := s.db.QueryRow(sqlStatement, shortURL)
+	row := db.QueryRow(sqlStatement, shortURL)
 
 	err := row.Scan(&url.ID, &url.OriginalURL, &url.ShortURL)
 
@@ -81,10 +88,11 @@ func (s *PostgreSQLStorage) GetOriginalURL(shortURL string) (string, error) {
 }
 
 func (s *PostgreSQLStorage) IsShortURLExists(shortURL string) bool {
-	defer s.db.Close()
+	db := s.DBPool.Get().(*sql.DB)
+	defer db.Close()
 
 	var exists bool
-	err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM urls WHERE short_url = $1)", shortURL).Scan(&exists)
+	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM urls WHERE short_url = $1)", shortURL).Scan(&exists)
 	if err != nil {
 		return false
 	}
@@ -92,10 +100,11 @@ func (s *PostgreSQLStorage) IsShortURLExists(shortURL string) bool {
 }
 
 func (s *PostgreSQLStorage) IsOriginalURLExists(originalURL string) bool {
-	defer s.db.Close()
+	db := s.DBPool.Get().(*sql.DB)
+	defer db.Close()
 
 	var exists bool
-	err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM urls WHERE original_url = $1)", originalURL).Scan(&exists)
+	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM urls WHERE original_url = $1)", originalURL).Scan(&exists)
 	if err != nil {
 		return false
 	}

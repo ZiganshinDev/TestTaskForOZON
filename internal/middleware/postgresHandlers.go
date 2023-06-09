@@ -29,6 +29,13 @@ func generateShortURL() string {
 }
 
 type PostgreSQLService struct {
+	storage *database.PostgreSQLStorage
+}
+
+func NewPostgreSQLService(storage *database.PostgreSQLStorage) *PostgreSQLService {
+	return &PostgreSQLService{
+		storage: storage,
+	}
 }
 
 func (s *PostgreSQLService) GetShortURL(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +46,7 @@ func (s *PostgreSQLService) GetShortURL(w http.ResponseWriter, r *http.Request) 
 		log.Fatalf("Unable to decode the request body. %v", err)
 	}
 
-	if !isValidURL(url.OriginalURL) || database.NewPostgreSQLStorage().IsOriginalURLExists(url.OriginalURL) {
+	if !isValidURL(url.OriginalURL) || s.storage.IsOriginalURLExists(url.OriginalURL) {
 		http.Error(w, "Invalid URL", http.StatusBadRequest)
 		return
 	}
@@ -47,8 +54,8 @@ func (s *PostgreSQLService) GetShortURL(w http.ResponseWriter, r *http.Request) 
 	// Генерируем короткий URL и проверяем его на уникальность
 	for {
 		shortURL := generateShortURL()
-		if !database.NewPostgreSQLStorage().IsShortURLExists(shortURL) {
-			database.NewPostgreSQLStorage().InsertURLs(url.OriginalURL, shortURL)
+		if !s.storage.IsShortURLExists(shortURL) {
+			s.storage.InsertURLs(url.OriginalURL, shortURL)
 			res := map[string]string{
 				"short_url": getProtocol(url.OriginalURL) + shortURL,
 			}
@@ -67,7 +74,7 @@ func (s *PostgreSQLService) GetOriginalURL(w http.ResponseWriter, r *http.Reques
 
 	shortURL := params["shorturl"]
 
-	originalURL, err := database.NewPostgreSQLStorage().GetOriginalURL(shortURL)
+	originalURL, err := s.storage.GetOriginalURL(shortURL)
 	if err != nil {
 		log.Fatalf("Unable to get url. %v", err)
 	}
