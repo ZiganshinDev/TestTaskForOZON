@@ -62,12 +62,12 @@ func (s *PostgreSQLService) GetShortURL(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (s *PostgreSQLService) GetLongURL(w http.ResponseWriter, r *http.Request) {
+func (s *PostgreSQLService) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	shortURL := params["shorturl"]
 
-	originalURL, err := database.NewPostgreSQLStorage().GetLongURL(shortURL)
+	originalURL, err := database.NewPostgreSQLStorage().GetOriginalURL(shortURL)
 	if err != nil {
 		log.Fatalf("Unable to get url. %v", err)
 	}

@@ -52,7 +52,7 @@ func (s *InMemoryService) GetShortURL(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func (s *InMemoryService) GetLongURL(w http.ResponseWriter, r *http.Request) {
+func (s *InMemoryService) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	shortURL := params["shorturl"]

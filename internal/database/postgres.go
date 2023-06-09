@@ -49,7 +49,7 @@ func (s *PostgreSQLStorage) InsertURLs(originalURL, shortURL string) {
 
 	sqlStatement := `INSERT INTO urls (original_url, short_url) VALUES ($1, $2)`
 
-	err := s.db.QueryRow(sqlStatement, originalURL, shortURL)
+	_, err := s.db.Exec(sqlStatement, originalURL, shortURL)
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
 	}
@@ -57,7 +57,7 @@ func (s *PostgreSQLStorage) InsertURLs(originalURL, shortURL string) {
 	log.Print("Inserted a single record")
 }
 
-func (s *PostgreSQLStorage) GetLongURL(shortURL string) (string, error) {
+func (s *PostgreSQLStorage) GetOriginalURL(shortURL string) (string, error) {
 	defer s.db.Close()
 
 	var url models.URLs
