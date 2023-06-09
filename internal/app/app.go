@@ -2,7 +2,6 @@ package app
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -20,7 +19,7 @@ func Run() {
 	flag.StringVar(&storageType, "storage", "in-memory", "Type of storage to use (in-memory or postgres)")
 	flag.Parse()
 
-	fmt.Println("Using storage:", storageType)
+	log.Println("Using storage:", storageType)
 
 	if storageType == "in-memory" {
 		// Инициализация in-memory хранилища
@@ -38,7 +37,7 @@ func Run() {
 		log.Fatal(http.ListenAndServe(":8080", r))
 	} else {
 		// Обработка некорректного значения флага
-		fmt.Println("Unknown storage type:", storageType)
+		log.Fatal("Unknown storage type:", storageType)
 		return
 	}
 }

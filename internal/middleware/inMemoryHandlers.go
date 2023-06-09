@@ -3,6 +3,7 @@ package middleware
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 
 	"github.com/gorilla/mux"
 )
@@ -29,7 +30,7 @@ func (s *InMemoryService) GetShortURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Проверяем, является ли URL валидным
-	if !isValidURL(originalURL.URL) {
+	if !isValidURL(originalURL.URL) || valueExists(s.urlMap, originalURL.URL) {
 		http.Error(w, "Invalid URL", http.StatusBadRequest)
 		return
 	}
@@ -70,4 +71,18 @@ func (s *InMemoryService) GetOriginalURL(w http.ResponseWriter, r *http.Request)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
+}
+
+func valueExists(m interface{}, value interface{}) bool {
+	v := reflect.ValueOf(m)
+	if v.Kind() != reflect.Map {
+		return false
+	}
+	keys := v.MapKeys()
+	for _, key := range keys {
+		if reflect.DeepEqual(v.MapIndex(key).Interface(), value) {
+			return true
+		}
+	}
+	return false
 }
