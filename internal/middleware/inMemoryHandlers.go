@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"reflect"
 
@@ -53,15 +54,24 @@ func (s *InMemoryService) GetShortURL(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// Ищет оригинальный URL в мапе
+func (s *InMemoryService) findOriginalURL(shortURL string) (string, error) {
+	originalURL, ok := s.urlMap[shortURL]
+	if !ok {
+		return "", fmt.Errorf("URL not found")
+	}
+	return originalURL, nil
+}
+
 func (s *InMemoryService) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	shortURL := params["shorturl"]
 
 	// Ищем оригинальный URL в мапе
-	originalURL, ok := s.urlMap[shortURL]
-	if !ok {
-		http.Error(w, "URL not found", http.StatusNotFound)
+	originalURL, err := s.findOriginalURL(shortURL)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
