@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"sync"
 
 	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/models"
@@ -24,7 +23,7 @@ type PostgreSQLStorage struct {
 }
 
 func NewPostgreSQLStorage() *PostgreSQLStorage {
-	password := os.Getenv("DB_PASSWORD")
+	password := 197320
 
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 

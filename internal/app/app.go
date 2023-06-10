@@ -6,15 +6,9 @@ import (
 	"net/http"
 
 	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/router"
-	"github.com/joho/godotenv"
 )
 
 func Run() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file. %v", err)
-	}
-
 	var storageType string
 	flag.StringVar(&storageType, "storage", "in-memory", "Type of storage to use (in-memory or postgres)")
 	flag.Parse()
