@@ -15,7 +15,7 @@ func TestGenerateShortURL(t *testing.T) {
 }
 
 func TestGetProtocol(t *testing.T) {
-	protocol := middleware.GetProtocol("https://example.com")
+	protocol := middleware.GetProtocol("https://www.ozon.ru/")
 
 	if protocol != "https://" {
 		t.Errorf("GetProtocol() = %q, want https://", protocol)

@@ -13,12 +13,12 @@ func Router(storage string) *mux.Router {
 		db := database.NewPostgreSQLStorage()
 		service := middleware.NewPostgreSQLService(db)
 
-		router.HandleFunc("/shorten", service.GetShortURL).Methods("POST")
+		router.HandleFunc("/short", service.GetShortURL).Methods("POST")
 		router.HandleFunc("/original/{shorturl}", service.GetOriginalURL).Methods("GET")
 	} else {
 		urlService := middleware.NewInMemoryService()
 
-		router.HandleFunc("/shorten", urlService.GetShortURL).Methods("POST")
+		router.HandleFunc("/short", urlService.GetShortURL).Methods("POST")
 		router.HandleFunc("/original/{shorturl}", urlService.GetOriginalURL).Methods("GET")
 	}
 

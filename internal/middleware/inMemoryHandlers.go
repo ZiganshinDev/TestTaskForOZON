@@ -86,3 +86,11 @@ func valueExists(m interface{}, value interface{}) bool {
 	}
 	return false
 }
+
+func (s *InMemoryService) GetURLMap() map[string]string {
+	return s.urlMap
+}
+
+func (s *InMemoryService) SetURLMap(urlMap map[string]string) {
+	s.urlMap = urlMap
+}
