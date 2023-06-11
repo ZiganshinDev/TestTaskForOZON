@@ -1,17 +1,20 @@
 package app
 
 import (
-	"flag"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/router"
 )
 
 func Run() {
-	var storageType string
-	flag.StringVar(&storageType, "storage", "in-memory", "Type of storage to use (in-memory or postgres)")
-	flag.Parse()
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatalf("Error loading .env file. %v", err)
+	// }
+
+	storageType := os.Getenv("STORAGE_TYPE")
 
 	log.Println("Using storage:", storageType)
 

@@ -1,6 +1,6 @@
-FROM golang:1.19.3-alpine AS build
+FROM golang:1.19.3-alpine
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git ca-certificates postgresql-client bash
 
 WORKDIR /app
 
@@ -12,13 +12,14 @@ RUN go mod download
 COPY . .
 
 WORKDIR /app/cmd/app
-
 RUN go build -o my-service .
 
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
 
-COPY --from=build /app/cmd/app/my-service .
+COPY --from=0 /app/cmd/app/my-service /usr/local/bin/my-service
 
-CMD ["./my-service"]
+COPY wait-for-postgres.sh .
+
+RUN chmod +x wait-for-postgres.sh
+
+CMD ["my-service"]

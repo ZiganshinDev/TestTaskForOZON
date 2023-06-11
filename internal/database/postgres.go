@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"sync"
 
 	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/models"
@@ -11,27 +12,16 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	host   = "localhost"
-	port   = 5432
-	user   = "postgres"
-	dbname = "OZON"
-)
-
 type PostgreSQLStorage struct {
 	DBPool *sync.Pool
 }
 
 func NewPostgreSQLStorage() *PostgreSQLStorage {
-	password := 197320
-
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
 	dbPool := &sync.Pool{
 		New: func() interface{} {
-			db, err := sql.Open("postgres", psqlconn)
+			db, err := sql.Open("postgres", fmt.Sprintf("postgres://postgres:%s@db:5432/postgres?sslmode=disable", os.Getenv("DB_PASSWORD")))
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("Error connecting to the database: %v", err)
 			}
 
 			err = db.Ping()
