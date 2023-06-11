@@ -1,6 +1,25 @@
 version: '3'
 
 services:
+  app_im:
+    build: ./
+    env_file:
+      - ./config/.env
+    command: ./app
+    ports:
+      - "8080:8080"
+
+  app_db:
+    build: .
+    command: ./wait-for-postgres.sh db ./app -db
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@db:5432/postgres?sslmode=disable"
+      DB_PASSWORD: "postgres"
+    ports:
+      - "8080:8080"
+
   db:
     image: postgres:latest
     restart: always
@@ -12,17 +31,4 @@ services:
       - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-
-  app:
-    build: .
-    restart: always
-    depends_on:
-      - db
-    env_file:
-      - ./config/.env
-    environment:
-      DATABASE_URL: "postgres://postgres:postgres@db:5432/postgres?sslmode=disable"
-      DB_PASSWORD: "postgres"
-    ports:
-      - "8080:8080"
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql

@@ -1,25 +1,16 @@
-FROM golang:1.19.3-alpine
+FROM golang:1.14-buster
 
-RUN apk add --no-cache git ca-certificates postgresql-client bash
+RUN go version
+ENV GOPATH=/
 
-WORKDIR /app
+COPY ./ ./
 
-COPY go.mod .
-COPY go.sum .
-
-RUN go mod download
-
-COPY . .
-
-WORKDIR /app/cmd/app
-RUN go build -o my-service .
-
-FROM alpine:latest
-
-COPY --from=0 /app/cmd/app/my-service /usr/local/bin/my-service
-
-COPY wait-for-postgres.sh .
+RUN apt-get update
+RUN apt-get -y install postgresql-client
 
 RUN chmod +x wait-for-postgres.sh
 
-CMD ["my-service"]
+RUN go mod download
+RUN go build -o app ./cmd/app/main.go
+
+CMD ["./app"]
