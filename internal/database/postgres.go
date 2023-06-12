@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
+	"os"
 	"sync"
 
 	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/models"
@@ -17,7 +18,7 @@ type PostgreSQLStorage struct {
 func NewPostgreSQLStorage() *PostgreSQLStorage {
 	dbPool := &sync.Pool{
 		New: func() interface{} {
-			db, err := sql.Open("postgres", "postgres://postgres:postgres@db:5432/postgres?sslmode=disable")
+			db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 			if err != nil {
 				log.Fatalf("Error connecting to the database: %v", err)
 			}

@@ -1,7 +1,7 @@
 FROM golang:1.14-buster
 
 ENV GOPATH=/
-ENV DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+ENV DATABASE_URL=postgres://postgres:postgres@db:5432/postgres?sslmode=disable
 
 COPY ./ ./
 
