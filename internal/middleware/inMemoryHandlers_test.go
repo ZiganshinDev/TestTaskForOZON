@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/middleware"
+	"github.com/ZiganshinDev/TestTaskForOZON/internal/middleware"
 )
 
 func TestGetShortURL(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/router"
+	"github.com/ZiganshinDev/TestTaskForOZON/internal/router"
 )
 
 func Run() {

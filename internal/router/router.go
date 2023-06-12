@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/database"
-	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/middleware"
+	"github.com/ZiganshinDev/TestTaskForOZON/internal/database"
+	"github.com/ZiganshinDev/TestTaskForOZON/internal/middleware"
 	"github.com/gorilla/mux"
 )
 

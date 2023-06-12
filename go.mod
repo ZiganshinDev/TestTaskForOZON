@@ -1,4 +1,4 @@
-module github.com/ZiganshinDev/My-Pet-Projects/testForOzon
+module github.com/ZiganshinDev/TestTaskForOZON
 
 go 1.19
 

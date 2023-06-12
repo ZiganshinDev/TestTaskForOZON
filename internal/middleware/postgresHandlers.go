@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/database"
-	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/models"
+	"github.com/ZiganshinDev/TestTaskForOZON/internal/database"
+	"github.com/ZiganshinDev/TestTaskForOZON/internal/models"
 	"github.com/gorilla/mux"
 )
 

@@ -6,8 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/models"
-
+	"github.com/ZiganshinDev/TestTaskForOZON/internal/models"
 	_ "github.com/lib/pq"
 )
 

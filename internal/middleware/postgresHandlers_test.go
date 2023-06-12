@@ -3,7 +3,7 @@ package middleware_test
 import (
 	"testing"
 
-	"github.com/ZiganshinDev/My-Pet-Projects/testForOzon/internal/middleware"
+	"github.com/ZiganshinDev/TestTaskForOZON/internal/middleware"
 )
 
 func TestGenerateShortURL(t *testing.T) {
