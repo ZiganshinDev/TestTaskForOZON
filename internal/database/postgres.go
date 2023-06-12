@@ -17,7 +17,7 @@ type PostgreSQLStorage struct {
 func NewPostgreSQLStorage() *PostgreSQLStorage {
 	dbPool := &sync.Pool{
 		New: func() interface{} {
-			db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable")
+			db, err := sql.Open("postgres", "postgres://postgres:postgres@db:5432/postgres?sslmode=disable")
 			if err != nil {
 				log.Fatalf("Error connecting to the database: %v", err)
 			}

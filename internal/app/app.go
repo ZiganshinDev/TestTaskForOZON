@@ -9,11 +9,6 @@ import (
 )
 
 func Run() {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatalf("Error loading .env file. %v", err)
-	// }
-
 	storageType := os.Getenv("STORAGE_TYPE")
 
 	log.Println("Using storage:", storageType)
